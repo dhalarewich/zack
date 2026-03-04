@@ -65,6 +65,13 @@ None. GameState is a Resource created by the Main scene and passed to children.
 - Use deterministic randomness (seeded RNG) for testable spawning/game logic.
 - Minimum 5 tests must exist and pass at all times.
 
+## Level System
+- Game has multiple levels (currently 3, target 3-5).
+- Each level: unique background, enemy waves, music, and a boss fight.
+- Level data is defined in `level_registry.gd` as `LevelData` resources.
+- Flow per level: Level Intro → Waves (1..N) → Boss → Next Level (or Victory).
+- To add a new level, add a `LevelData` entry in `LevelRegistry._levels()`.
+
 ## Adding a New Enemy
 1. Create `game/scenes/NewEnemy.tscn` (CharacterBody2D + CollisionShape2D + visual).
 2. Create `game/scripts/new_enemy.gd` extending the base enemy pattern.
