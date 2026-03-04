@@ -87,15 +87,21 @@ jobs:
       - name: Import project (generate .godot cache)
         run: |
           cd game
-          timeout 30 $GODOT_BIN --headless --import || true
+          # First pass: import resources and build class cache.
+          # May exit non-zero on first run due to deferred import race (godotengine/godot#77508).
+          timeout 60 $GODOT_BIN --headless --import || true
+          # Second pass: completes any remaining imports that were deferred.
+          timeout 60 $GODOT_BIN --headless --import
 
       - name: Run GUT tests
-        timeout-minutes: 5
+        timeout-minutes: 3
         env:
           GODOT_DISABLE_LEAK_CHECKS: 1
         run: |
           cd game
           timeout 120 $GODOT_BIN --headless \
+            --display-driver headless \
+            --audio-driver Dummy \
             -s addons/gut/gut_cmdln.gd \
             -gdir=res://tests/ \
             -ginclude_subdirs \
