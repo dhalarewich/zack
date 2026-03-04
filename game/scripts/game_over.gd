@@ -3,8 +3,9 @@ extends Control
 
 signal retry_game
 
-@onready var _score_label: Label = %FinalScoreLabel
 var _input_cooldown: float = 0.5
+
+@onready var _score_label: Label = %FinalScoreLabel
 
 
 func show_score(final_score: int) -> void:

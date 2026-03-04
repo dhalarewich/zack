@@ -6,17 +6,17 @@ signal game_over
 const BulletScene: PackedScene = preload("res://scenes/bullet.tscn")
 const EnemyScene: PackedScene = preload("res://scenes/enemy.tscn")
 
+var _game_state: GameState
+var _rng := RandomNumberGenerator.new()
+var _enemies_to_spawn: int = 0
+var _enemies_spawned_this_wave: int = 0
+
 @onready var _player: CharacterBody2D = $Player
 @onready var _bullet_container: Node2D = $Bullets
 @onready var _enemy_container: Node2D = $Enemies
 @onready var _spawn_timer: Timer = $SpawnTimer
 @onready var _wave_delay_timer: Timer = $WaveDelayTimer
 @onready var _hud: CanvasLayer = $HUD
-
-var _game_state: GameState
-var _rng := RandomNumberGenerator.new()
-var _enemies_to_spawn: int = 0
-var _enemies_spawned_this_wave: int = 0
 
 
 func setup(game_state: GameState) -> void:

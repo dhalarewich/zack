@@ -2,11 +2,11 @@ extends Node
 ## Root scene: manages screen transitions (Title -> Playing -> GameOver).
 ## Creates GameState and passes it to child scenes — no autoloads.
 
+enum Screen { TITLE, PLAYING, GAME_OVER }
+
 const TitleScene: PackedScene = preload("res://scenes/title_screen.tscn")
 const GameplayScene: PackedScene = preload("res://scenes/gameplay.tscn")
 const GameOverScene: PackedScene = preload("res://scenes/game_over.tscn")
-
-enum Screen { TITLE, PLAYING, GAME_OVER }
 
 var _current_screen: Screen = Screen.TITLE
 var _current_scene: Node = null

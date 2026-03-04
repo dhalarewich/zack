@@ -1,16 +1,20 @@
-class-definitions-order := [
-    "tools",
-    "classnames",
-    "extends",
-    "docstrings",
-    "signals",
-    "enums",
-    "consts",
-    "exported-variables",
-    "public-variables",
-    "private-variables",
-    "onready-variables",
-    "others",
-]
-max-line-length := 100
-max-file-lines := 500
+class-definitions-order:
+- tools
+- classnames
+- extends
+- docstrings
+- signals
+- enums
+- consts
+- staticvars
+- exports
+- pubvars
+- prvvars
+- onreadypubvars
+- onreadyprvvars
+- others
+excluded_directories: !!set
+  .git: null
+  addons: null
+max-line-length: 100
+max-file-lines: 500

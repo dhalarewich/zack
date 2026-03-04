@@ -1,11 +1,11 @@
 extends CanvasLayer
 ## Heads-up display: shows score, HP, and wave number during gameplay.
 
+var _game_state: GameState
+
 @onready var _score_label: Label = %ScoreLabel
 @onready var _hp_label: Label = %HPLabel
 @onready var _wave_label: Label = %WaveLabel
-
-var _game_state: GameState
 
 
 func setup(game_state: GameState) -> void:
