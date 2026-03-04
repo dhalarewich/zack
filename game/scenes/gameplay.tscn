@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://gplay0001"]
+
+[ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_gameplay"]
+[ext_resource type="PackedScene" uid="uid://player001" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://hud00001" path="res://scenes/hud.tscn" id="3_hud"]
+
+[node name="Gameplay" type="Node2D"]
+script = ExtResource("1_gameplay")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 960.0
+offset_bottom = 540.0
+color = Color(0.04, 0.02, 0.1, 1)
+
+[node name="Player" type="CharacterBody2D" parent="." instance=ExtResource("2_player")]
+position = Vector2(480, 270)
+
+[node name="Bullets" type="Node2D" parent="."]
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="." instance=ExtResource("3_hud")]
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time = 1.5
+
+[node name="WaveDelayTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
