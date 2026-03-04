@@ -1,0 +1,16 @@
+class-definitions-order := [
+    "tools",
+    "classnames",
+    "extends",
+    "docstrings",
+    "signals",
+    "enums",
+    "consts",
+    "exported-variables",
+    "public-variables",
+    "private-variables",
+    "onready-variables",
+    "others",
+]
+max-line-length := 100
+max-file-lines := 500
