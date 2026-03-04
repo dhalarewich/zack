@@ -20,6 +20,11 @@ func set_wave(wave: int) -> void:
 		_wave_label.text = "WAVE " + str(wave)
 
 
+func set_wave_text(text: String) -> void:
+	if _wave_label:
+		_wave_label.text = text
+
+
 func _update_all() -> void:
 	if _game_state:
 		_on_score_changed(_game_state.score)

@@ -66,3 +66,33 @@ func test_advance_wave() -> void:
 	assert_eq(state.current_wave, 2, "Wave should be 2 after advancing once")
 	state.advance_wave()
 	assert_eq(state.current_wave, 3, "Wave should be 3 after advancing twice")
+
+
+func test_initial_level() -> void:
+	var state := GameState.new()
+	assert_eq(state.current_level, 1, "Initial level should be 1")
+
+
+func test_advance_level_increments_and_resets_wave() -> void:
+	var state := GameState.new()
+	state.advance_wave()
+	state.advance_wave()
+	assert_eq(state.current_wave, 3, "Wave should be 3 before level advance")
+	state.advance_level()
+	assert_eq(state.current_level, 2, "Level should be 2 after advancing")
+	assert_eq(state.current_wave, 1, "Wave should reset to 1 on new level")
+
+
+func test_get_level_data_returns_valid() -> void:
+	var state := GameState.new()
+	var data: LevelData = state.get_level_data()
+	assert_not_null(data, "Level data should not be null")
+	assert_eq(data.level_number, 1, "First level data should be level 1")
+
+
+func test_reset_restores_level() -> void:
+	var state := GameState.new()
+	state.advance_level()
+	state.advance_level()
+	state.reset()
+	assert_eq(state.current_level, 1, "Level should reset to 1")

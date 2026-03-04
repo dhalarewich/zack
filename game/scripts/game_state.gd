@@ -6,6 +6,7 @@ extends Resource
 signal score_changed(new_score: int)
 signal hp_changed(new_hp: int)
 signal player_died
+signal level_completed(level_number: int)
 
 const MAX_HP: int = 3
 const SCORE_PER_KILL: int = 100
@@ -13,6 +14,7 @@ const SCORE_PER_KILL: int = 100
 var score: int = 0
 var hp: int = MAX_HP
 var current_wave: int = 1
+var current_level: int = 1
 
 
 func add_score(amount: int = SCORE_PER_KILL) -> void:
@@ -35,7 +37,22 @@ func advance_wave() -> void:
 	current_wave += 1
 
 
+func advance_level() -> void:
+	level_completed.emit(current_level)
+	current_level += 1
+	current_wave = 1
+
+
+func is_final_level() -> bool:
+	return current_level >= LevelRegistry.get_level_count()
+
+
+func get_level_data() -> LevelData:
+	return LevelRegistry.get_level(current_level)
+
+
 func reset() -> void:
 	score = 0
 	hp = MAX_HP
 	current_wave = 1
+	current_level = 1
