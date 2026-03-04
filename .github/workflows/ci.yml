@@ -87,14 +87,20 @@ jobs:
       - name: Import project (generate .godot cache)
         run: |
           cd game
-          timeout 30 $GODOT_BIN --headless --import || true
+          timeout 30 $GODOT_BIN --headless --display-driver headless \
+            --audio-driver Dummy --import || true
 
       - name: Run GUT tests
         timeout-minutes: 5
+        env:
+          GODOT_DISABLE_LEAK_CHECKS: 1
         run: |
           cd game
-          timeout 120 $GODOT_BIN --headless -s addons/gut/gut_cmdln.gd \
+          timeout 120 $GODOT_BIN --headless --display-driver headless \
+            --audio-driver Dummy --disable-render-loop \
+            -s addons/gut/gut_cmdln.gd \
             -gdir=res://tests/ \
+            -ginclude_subdirs \
             -gprefix=test_ \
             -gsuffix=.gd \
             -gexit
