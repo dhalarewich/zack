@@ -90,9 +90,10 @@ jobs:
           timeout 30 $GODOT_BIN --headless --import || true
 
       - name: Run GUT tests
+        timeout-minutes: 5
         run: |
           cd game
-          $GODOT_BIN --headless -s addons/gut/gut_cmdln.gd \
+          timeout 120 $GODOT_BIN --headless -s addons/gut/gut_cmdln.gd \
             -gdir=res://tests/ \
             -gprefix=test_ \
             -gsuffix=.gd \
