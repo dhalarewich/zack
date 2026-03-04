@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GODOT_VERSION: "4.6-stable"
-      GUT_VERSION: "v9.3.0"
+      GUT_VERSION: "v9.6.0"
     steps:
       - uses: actions/checkout@v4
 
