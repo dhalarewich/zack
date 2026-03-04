@@ -1,0 +1,29 @@
+# Godot 4.x
+game/.godot/
+game/.uid_cache
+*.translation
+
+# Godot exports
+game/export/
+*.pck
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+*~
+
+# Editor
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Python (gdtoolkit)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# GUT addon (installed at dev time, not vendored)
+game/addons/gut/

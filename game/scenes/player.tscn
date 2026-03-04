@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3 uid="uid://player001"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
+[ext_resource type="AudioStream" path="res://assets/audio/laser.wav" id="2_laser"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(20, 24)
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("1_player")
+
+[node name="Body" type="ColorRect" parent="."]
+offset_left = -10.0
+offset_top = -12.0
+offset_right = 10.0
+offset_bottom = 12.0
+color = Color(0.2, 0.8, 0.3, 1)
+
+[node name="Nose" type="ColorRect" parent="."]
+offset_left = -5.0
+offset_top = -20.0
+offset_right = 5.0
+offset_bottom = -12.0
+color = Color(0.4, 1.0, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="LaserSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_laser")
+volume_db = -6.0
