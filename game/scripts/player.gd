@@ -10,6 +10,8 @@ const FIRE_COOLDOWN: float = 0.15
 var _fire_timer: float = 0.0
 var _shoot_direction: Vector2 = Vector2.UP
 
+@onready var _laser_sound: AudioStreamPlayer2D = $LaserSound
+
 
 func _physics_process(delta: float) -> void:
 	_handle_movement()
@@ -35,6 +37,8 @@ func _handle_shooting(delta: float) -> void:
 	if Input.is_action_pressed("shoot") and _fire_timer <= 0.0:
 		_fire_timer = FIRE_COOLDOWN
 		shoot_requested.emit(global_position, _shoot_direction)
+		if _laser_sound:
+			_laser_sound.play()
 
 
 func _clamp_to_arena() -> void:

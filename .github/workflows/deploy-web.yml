@@ -1,0 +1,109 @@
+name: Deploy Web Build to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  export-web:
+    name: Export & Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GODOT_VERSION: "4.6-stable"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Godot
+        run: |
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip" \
+            -O /tmp/godot.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v${GODOT_VERSION}_linux.x86_64
+          echo "GODOT_BIN=/tmp/godot/Godot_v${GODOT_VERSION}_linux.x86_64" >> $GITHUB_ENV
+
+      - name: Download export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_export_templates.tpz" \
+            -O /tmp/templates.tpz
+          unzip -q /tmp/templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}/
+
+      - name: Import project
+        run: |
+          cd game
+          timeout 30 $GODOT_BIN --headless --import || true
+
+      - name: Export for Web
+        run: |
+          mkdir -p build/web
+          cd game
+          $GODOT_BIN --headless --export-release "Web" ../build/web/index.html
+
+      - name: Add Cross-Origin Isolation service worker
+        run: |
+          # GitHub Pages doesn't support custom headers, so we use a service
+          # worker to add the required COOP/COEP headers for SharedArrayBuffer.
+          # This is the standard approach recommended by the Godot community.
+          cat > build/web/coi-serviceworker.js << 'SWEOF'
+          /*! coi-service-worker v0.1.7 - Guido Zuidhof, licensed under MIT */
+          if (typeof window === 'undefined') {
+            self.addEventListener("install", () => self.skipWaiting());
+            self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+            self.addEventListener("fetch", (e) => {
+              if (e.request.cache === "only-if-cached" && e.request.mode !== "same-origin") return;
+              e.respondWith(
+                fetch(e.request).then((r) => {
+                  if (r.status === 0) return r;
+                  const headers = new Headers(r.headers);
+                  headers.set("Cross-Origin-Embedder-Policy", "credentialless");
+                  headers.set("Cross-Origin-Opener-Policy", "same-origin");
+                  return new Response(r.body, { status: r.status, statusText: r.statusText, headers });
+                })
+              );
+            });
+          } else {
+            const reloadedByCOI = window.sessionStorage.getItem("coiReloadedByCOI");
+            window.sessionStorage.removeItem("coiReloadedByCOI");
+            const coiError = () => { /* silently ignore */ };
+            if (window.crossOriginIsolated !== false || reloadedByCOI) return;
+            if (!window.isSecureContext) { console.log("COOP/COEP requires secure context"); return; }
+            navigator.serviceWorker.register(window.document.currentScript.src).then(
+              (registration) => {
+                if (registration.active && !navigator.serviceWorker.controller) {
+                  window.sessionStorage.setItem("coiReloadedByCOI", "true");
+                  window.location.reload();
+                }
+              },
+              coiError
+            );
+          }
+          SWEOF
+
+          # Inject the service worker script tag into the exported HTML
+          sed -i 's|<head>|<head><script src="coi-serviceworker.js"></script>|' build/web/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
