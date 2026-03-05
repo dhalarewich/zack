@@ -20,6 +20,8 @@ func setup(final_score: int) -> void:
 func _ready() -> void:
 	if _score_label:
 		_score_label.text = "SCORE: " + str(_final_score)
+	if DisplayServer.is_touchscreen_available() and _retry_label:
+		_retry_label.text = "TAP TO RETRY"
 	_input_cooldown = 0.5
 
 
@@ -30,6 +32,10 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _input_cooldown > 0.0:
+		return
+	if event is InputEventScreenTouch and event.pressed:
+		retry_game.emit()
+		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("accept"):
 		retry_game.emit()

@@ -10,6 +10,7 @@ const BulletScene: PackedScene = preload("res://scenes/bullet.tscn")
 const EnemyScene: PackedScene = preload("res://scenes/enemy.tscn")
 const BossScene: PackedScene = preload("res://scenes/boss.tscn")
 const PowerUpScene: PackedScene = preload("res://scenes/power_up.tscn")
+const TouchControlsScene: PackedScene = preload("res://scenes/touch_controls.tscn")
 const PLAYER2_SPRITE_PATH: String = "res://assets/sprites/player-ship2.png"
 const ENEMY_SPRITES: Array[String] = [
 	"res://assets/sprites/enemy-1.png",
@@ -82,6 +83,8 @@ func _ready() -> void:
 	_wave_delay_timer.timeout.connect(_on_wave_delay_timeout)
 	_start_music()
 	_start_wave()
+	if DisplayServer.is_touchscreen_available():
+		add_child(TouchControlsScene.instantiate())
 
 
 func _spawn_players() -> void:

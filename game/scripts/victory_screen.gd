@@ -32,18 +32,32 @@ func _ready() -> void:
 	if _score_label:
 		_score_label.text = "FINAL SCORE: " + str(_final_score)
 
+	var is_touch: bool = DisplayServer.is_touchscreen_available()
+
 	if HighScores.is_high_score(_final_score):
-		_state = State.ENTERING_INITIALS
-		_update_initials_display()
-		if _prompt_label:
-			_prompt_label.text = "ENTER YOUR INITIALS"
+		if is_touch:
+			# No keyboard on mobile — auto-submit initials as "ZAK"
+			_initials = "ZAK"
+			HighScores.insert_score(_initials, _final_score)
+			_state = State.SHOWING_SCORES
+			_show_leaderboard()
+			if _prompt_label:
+				_prompt_label.text = "TAP TO CONTINUE"
+		else:
+			_state = State.ENTERING_INITIALS
+			_update_initials_display()
+			if _prompt_label:
+				_prompt_label.text = "ENTER YOUR INITIALS"
 	else:
 		_state = State.SHOWING_SCORES
 		_show_leaderboard()
 		if _initials_label:
 			_initials_label.visible = false
 		if _prompt_label:
-			_prompt_label.text = "PRESS ENTER TO CONTINUE"
+			if is_touch:
+				_prompt_label.text = "TAP TO CONTINUE"
+			else:
+				_prompt_label.text = "PRESS ENTER TO CONTINUE"
 
 	_input_cooldown = 0.5
 
@@ -55,6 +69,12 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _input_cooldown > 0.0:
+		return
+
+	if event is InputEventScreenTouch and event.pressed:
+		if _state == State.SHOWING_SCORES:
+			go_to_title.emit()
+			get_viewport().set_input_as_handled()
 		return
 
 	if _state == State.ENTERING_INITIALS:

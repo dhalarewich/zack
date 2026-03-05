@@ -38,7 +38,14 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _can_skip and event.is_action_pressed("accept"):
+	if not _can_skip:
+		return
+	if event is InputEventScreenTouch and event.pressed:
+		intro_finished.emit()
+		set_process(false)
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("accept"):
 		intro_finished.emit()
 		set_process(false)
 		get_viewport().set_input_as_handled()

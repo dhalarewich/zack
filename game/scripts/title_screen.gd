@@ -21,6 +21,14 @@ func _ready() -> void:
 	if _mode2_label:
 		_dim_settings = _mode2_label.label_settings
 	_update_mode_labels()
+	# On touch devices, hide 2P option and update prompt
+	if DisplayServer.is_touchscreen_available():
+		if _prompt_label:
+			_prompt_label.text = "TAP TO START"
+		if _mode1_label:
+			_mode1_label.visible = false
+		if _mode2_label:
+			_mode2_label.visible = false
 
 
 func _process(delta: float) -> void:
@@ -31,6 +39,10 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and event.pressed:
+		start_game.emit(1)
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("move_left") or event.is_action_pressed("move_right"):
 		_selected_mode = 2 if _selected_mode == 1 else 1
 		_update_mode_labels()

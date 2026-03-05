@@ -11,6 +11,7 @@ const LevelIntroScene: PackedScene = preload("res://scenes/level_intro.tscn")
 const GameplayScene: PackedScene = preload("res://scenes/gameplay.tscn")
 const GameOverScene: PackedScene = preload("res://scenes/game_over.tscn")
 const VictoryScene: PackedScene = preload("res://scenes/victory_screen.tscn")
+const FullscreenButtonScene: PackedScene = preload("res://scenes/fullscreen_button.tscn")
 
 const TITLE_MUSIC_PATH: String = "res://assets/audio/title-music.mp3"
 const GAMEOVER_MUSIC_PATH: String = "res://assets/audio/gameover-music.mp3"
@@ -24,11 +25,14 @@ var _game_state: GameState
 var _title_music: AudioStreamPlayer
 var _gameover_music: AudioStreamPlayer
 var _ending_music: AudioStreamPlayer
+var _first_show: bool = true
 
 
 func _ready() -> void:
 	_setup_music_players()
 	_show_title()
+	if DisplayServer.is_touchscreen_available():
+		add_child(FullscreenButtonScene.instantiate())
 
 
 func _setup_music_players() -> void:
@@ -61,7 +65,12 @@ func _show_title() -> void:
 	var title: Control = TitleScene.instantiate()
 	title.start_game.connect(_start_new_game)
 	_set_scene(title)
-	_play_music(_title_music)
+	# Defer title music on first load so iOS Safari AudioContext can be
+	# resumed by a user gesture before any audio plays.
+	if _first_show:
+		_first_show = false
+	else:
+		_play_music(_title_music)
 
 
 func _start_new_game(player_count: int = 1) -> void:
