@@ -8,19 +8,22 @@ const DISPLAY_TIME: float = 3.0
 
 var _timer: float = 0.0
 var _can_skip: bool = false
+var _level_data: LevelData
 
 @onready var _level_number_label: Label = %LevelNumberLabel
 @onready var _level_name_label: Label = %LevelNameLabel
 
 
 func setup(level_data: LevelData) -> void:
-	if _level_number_label:
-		_level_number_label.text = "LEVEL " + str(level_data.level_number)
-	if _level_name_label:
-		_level_name_label.text = level_data.level_name
+	_level_data = level_data
 
 
 func _ready() -> void:
+	if _level_data:
+		if _level_number_label:
+			_level_number_label.text = "LEVEL " + str(_level_data.level_number)
+		if _level_name_label:
+			_level_name_label.text = _level_data.level_name
 	_timer = DISPLAY_TIME
 	# Brief delay before accepting skip input.
 	await get_tree().create_timer(0.5).timeout

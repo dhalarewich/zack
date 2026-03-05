@@ -18,3 +18,4 @@ excluded_directories: !!set
   addons: null
 max-line-length: 100
 max-file-lines: 500
+max-public-methods: 30

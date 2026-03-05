@@ -3,8 +3,8 @@ extends RefCounted
 ## Pure-logic class that calculates wave parameters.
 ## No scene dependency — easy to unit test.
 
-const BASE_ENEMY_COUNT: int = 3
-const ENEMIES_PER_WAVE: int = 2
+const BASE_ENEMY_COUNT: int = 6
+const ENEMIES_PER_WAVE: int = 4
 const BASE_SPAWN_DELAY: float = 1.5
 const MIN_SPAWN_DELAY: float = 0.3
 const SPAWN_DELAY_REDUCTION: float = 0.15

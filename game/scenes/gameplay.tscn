@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://gplay0001"]
+[gd_scene load_steps=3 format=3 uid="uid://gplay0001"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_gameplay"]
-[ext_resource type="PackedScene" uid="uid://player001" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://hud00001" path="res://scenes/hud.tscn" id="3_hud"]
 
 [node name="Gameplay" type="Node2D"]
@@ -12,12 +11,19 @@ offset_right = 960.0
 offset_bottom = 540.0
 color = Color(0.04, 0.02, 0.1, 1)
 
-[node name="Player" type="CharacterBody2D" parent="." instance=ExtResource("2_player")]
-position = Vector2(480, 270)
+[node name="BackgroundTexture" type="TextureRect" parent="."]
+offset_right = 960.0
+offset_bottom = 540.0
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Players" type="Node2D" parent="."]
 
 [node name="Bullets" type="Node2D" parent="."]
 
 [node name="Enemies" type="Node2D" parent="."]
+
+[node name="PowerUps" type="Node2D" parent="."]
 
 [node name="HUD" type="CanvasLayer" parent="." instance=ExtResource("3_hud")]
 

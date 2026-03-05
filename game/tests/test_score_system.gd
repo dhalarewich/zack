@@ -50,5 +50,5 @@ func _on_hp_changed(new_hp: int) -> void:
 	_last_hp_received = new_hp
 
 
-func _on_player_died() -> void:
+func _on_player_died(_player_index: int) -> void:
 	_player_died = true

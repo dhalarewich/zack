@@ -1,6 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://gmover001"]
+[gd_scene load_steps=5 format=3 uid="uid://gmover001"]
 
 [ext_resource type="Script" path="res://scripts/game_over.gd" id="1_gameover"]
+[ext_resource type="Texture2D" path="res://assets/sprites/gameover-ship.png" id="2_shipimg"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 36
+font_color = Color(1.0, 0.3, 0.3, 1.0)
+outline_size = 4
+outline_color = Color(0.0, 0.0, 0.0, 1.0)
+
+[sub_resource type="LabelSettings" id="LabelSettings_body"]
+font_size = 20
+font_color = Color(0.85, 0.85, 0.85, 1.0)
+outline_size = 2
+outline_color = Color(0.0, 0.0, 0.0, 1.0)
 
 [node name="GameOver" type="Control"]
 layout_mode = 3
@@ -18,7 +31,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.15, 0.02, 0.02, 1)
+color = Color(0.1, 0.02, 0.02, 1)
 
 [node name="GameOverLabel" type="Label" parent="."]
 unique_name_in_owner = true
@@ -26,13 +39,45 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -200.0
-offset_top = 150.0
-offset_right = 200.0
-offset_bottom = 220.0
+offset_left = -300.0
+offset_top = 40.0
+offset_right = 300.0
+offset_bottom = 90.0
 horizontal_alignment = 1
 vertical_alignment = 1
 text = "GAME OVER"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="DescriptionLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 100.0
+offset_right = 300.0
+offset_bottom = 170.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "You have perished in the great battle.
+The galaxy mourns a brave pilot."
+autowrap_mode = 2
+label_settings = SubResource("LabelSettings_body")
+
+[node name="ShipImage" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 185.0
+offset_right = 100.0
+offset_bottom = 385.0
+texture = ExtResource("2_shipimg")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="FinalScoreLabel" type="Label" parent="."]
 unique_name_in_owner = true
@@ -41,12 +86,13 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
-offset_top = 250.0
+offset_top = 400.0
 offset_right = 200.0
-offset_bottom = 280.0
+offset_bottom = 430.0
 horizontal_alignment = 1
 vertical_alignment = 1
 text = "SCORE: 0"
+label_settings = SubResource("LabelSettings_body")
 
 [node name="RetryLabel" type="Label" parent="."]
 unique_name_in_owner = true
@@ -55,9 +101,10 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
-offset_top = 350.0
+offset_top = 460.0
 offset_right = 200.0
-offset_bottom = 380.0
+offset_bottom = 500.0
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "PRESS ENTER TO RETRY"
+text = "Press Enter to try again"
+label_settings = SubResource("LabelSettings_body")
