@@ -1,6 +1,38 @@
-[gd_scene load_steps=2 format=3 uid="uid://title0001"]
+[gd_scene load_steps=8 format=3 uid="uid://title0001"]
 
 [ext_resource type="Script" path="res://scripts/title_screen.gd" id="1_title"]
+[ext_resource type="Texture2D" uid="uid://c2gmp0typa4gt" path="res://assets/sprites/title-screen.png" id="2_titlebg"]
+
+[sub_resource type="SystemFont" id="SystemFont_bold"]
+font_weight = 700
+
+[sub_resource type="LabelSettings" id="LabelSettings_prompt"]
+font = SubResource("SystemFont_bold")
+font_size = 36
+font_color = Color(1, 1, 1, 1)
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_mode_active"]
+font = SubResource("SystemFont_bold")
+font_size = 22
+font_color = Color(1, 0.9, 0.2, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_mode_dim"]
+font = SubResource("SystemFont_bold")
+font_size = 22
+font_color = Color(0.5, 0.5, 0.5, 0.7)
+outline_size = 3
+outline_color = Color(0, 0, 0, 0.6)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hint"]
+font = SubResource("SystemFont_bold")
+font_size = 14
+font_color = Color(0.85, 0.85, 0.85, 0.9)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
 
 [node name="TitleScreen" type="Control"]
 layout_mode = 3
@@ -11,16 +43,19 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_title")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05, 0.02, 0.15, 1)
+texture = ExtResource("2_titlebg")
+expand_mode = 1
+stretch_mode = 0
 
 [node name="TitleLabel" type="Label" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -34,6 +69,7 @@ vertical_alignment = 1
 text = "ZACK'S GALACTIC ADVENTURE"
 
 [node name="SubtitleLabel" type="Label" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -46,30 +82,74 @@ horizontal_alignment = 1
 vertical_alignment = 1
 text = "A Top-Down Space Shooter"
 
+[node name="BottomPanel" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -170.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0, 0, 0, 0.55)
+
 [node name="PromptLabel" type="Label" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -150.0
-offset_top = 350.0
-offset_right = 150.0
-offset_bottom = 380.0
+offset_left = -250.0
+offset_top = 340.0
+offset_right = 250.0
+offset_bottom = 390.0
 horizontal_alignment = 1
 vertical_alignment = 1
+pivot_offset = Vector2(250, 25)
 text = "PRESS ENTER OR START"
+label_settings = SubResource("LabelSettings_prompt")
 
-[node name="ControlsLabel" type="Label" parent="."]
+[node name="Mode1Label" type="Label" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
-offset_top = 420.0
+offset_top = 400.0
+offset_right = -10.0
+offset_bottom = 428.0
+horizontal_alignment = 2
+vertical_alignment = 1
+text = "1 PLAYER"
+label_settings = SubResource("LabelSettings_mode_active")
+
+[node name="Mode2Label" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 10.0
+offset_top = 400.0
+offset_right = 200.0
+offset_bottom = 428.0
+horizontal_alignment = 0
+vertical_alignment = 1
+text = "2 PLAYERS"
+label_settings = SubResource("LabelSettings_mode_dim")
+
+[node name="HintLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 440.0
 offset_right = 200.0
 offset_bottom = 500.0
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "WASD / Left Stick - Move
-Space / Cross Button - Shoot"
+text = "Arrow Keys: Select Mode
+WASD / Stick: Move    Space / A: Shoot"
+label_settings = SubResource("LabelSettings_hint")
