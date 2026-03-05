@@ -38,11 +38,16 @@ func _process(delta: float) -> void:
 		_prompt_label.scale = Vector2(pulse, pulse)
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventScreenTouch and event.pressed:
+func _input(event: InputEvent) -> void:
+	# Catch taps early — _unhandled_input won't see them because
+	# Background (TextureRect) and BottomPanel (ColorRect) consume
+	# the emulated mouse event with mouse_filter STOP.
+	if _is_tap(event):
 		start_game.emit(1)
 		get_viewport().set_input_as_handled()
-		return
+
+
+func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("move_left") or event.is_action_pressed("move_right"):
 		_selected_mode = 2 if _selected_mode == 1 else 1
 		_update_mode_labels()
@@ -50,6 +55,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("accept"):
 		start_game.emit(_selected_mode)
 		get_viewport().set_input_as_handled()
+
+
+static func _is_tap(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		return event.pressed
+	if event is InputEventMouseButton:
+		if DisplayServer.is_touchscreen_available():
+			return event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	return false
 
 
 func _update_mode_labels() -> void:

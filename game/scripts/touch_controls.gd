@@ -35,6 +35,9 @@ func _ready() -> void:
 	_draw_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_draw_node.draw.connect(_on_draw)
 	add_child(_draw_node)
+	# On orientation change / resize, the screen→viewport transform changes
+	# so we must release all fingers and redraw.
+	get_viewport().size_changed.connect(_on_viewport_resized)
 
 
 func _input(event: InputEvent) -> void:
@@ -42,6 +45,15 @@ func _input(event: InputEvent) -> void:
 		_handle_touch(event as InputEventScreenTouch)
 	elif event is InputEventScreenDrag:
 		_handle_drag(event as InputEventScreenDrag)
+	elif event is InputEventMouseButton and DisplayServer.is_touchscreen_available():
+		# Fallback: some mobile browsers only send emulated mouse events.
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_LEFT:
+			var fake_touch := InputEventScreenTouch.new()
+			fake_touch.index = 0
+			fake_touch.position = mb.position
+			fake_touch.pressed = mb.pressed
+			_handle_touch(fake_touch)
 
 
 func _handle_touch(event: InputEventScreenTouch) -> void:
@@ -124,6 +136,21 @@ func _apply_joystick_input() -> void:
 	else:
 		Input.action_release("move_up")
 		Input.action_release("move_down")
+
+
+func _on_viewport_resized() -> void:
+	# Release all active inputs so stale finger state doesn't persist
+	# after an orientation change.
+	if _joystick_finger != -1:
+		_joystick_finger = -1
+		Input.action_release("move_left")
+		Input.action_release("move_right")
+		Input.action_release("move_up")
+		Input.action_release("move_down")
+	if _fire_finger != -1:
+		_fire_finger = -1
+		Input.action_release("shoot")
+	_draw_node.queue_redraw()
 
 
 func _screen_to_viewport(screen_pos: Vector2) -> Vector2:

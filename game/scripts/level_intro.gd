@@ -37,15 +37,28 @@ func _process(delta: float) -> void:
 		set_process(false)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not _can_skip:
 		return
-	if event is InputEventScreenTouch and event.pressed:
+	if _is_tap(event):
 		intro_finished.emit()
 		set_process(false)
 		get_viewport().set_input_as_handled()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _can_skip:
 		return
 	if event.is_action_pressed("accept"):
 		intro_finished.emit()
 		set_process(false)
 		get_viewport().set_input_as_handled()
+
+
+static func _is_tap(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		return event.pressed
+	if event is InputEventMouseButton:
+		if DisplayServer.is_touchscreen_available():
+			return event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	return false

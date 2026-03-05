@@ -67,14 +67,16 @@ func _process(delta: float) -> void:
 		_input_cooldown -= delta
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if _input_cooldown > 0.0:
 		return
+	if _is_tap(event) and _state == State.SHOWING_SCORES:
+		go_to_title.emit()
+		get_viewport().set_input_as_handled()
 
-	if event is InputEventScreenTouch and event.pressed:
-		if _state == State.SHOWING_SCORES:
-			go_to_title.emit()
-			get_viewport().set_input_as_handled()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _input_cooldown > 0.0:
 		return
 
 	if _state == State.ENTERING_INITIALS:
@@ -152,3 +154,12 @@ func _show_leaderboard() -> void:
 
 	if _high_scores_title:
 		_high_scores_title.visible = true
+
+
+static func _is_tap(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		return event.pressed
+	if event is InputEventMouseButton:
+		if DisplayServer.is_touchscreen_available():
+			return event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	return false
