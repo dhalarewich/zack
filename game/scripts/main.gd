@@ -25,7 +25,6 @@ var _game_state: GameState
 var _title_music: AudioStreamPlayer
 var _gameover_music: AudioStreamPlayer
 var _ending_music: AudioStreamPlayer
-var _first_show: bool = true
 
 
 func _ready() -> void:
@@ -65,12 +64,7 @@ func _show_title() -> void:
 	var title: Control = TitleScene.instantiate()
 	title.start_game.connect(_start_new_game)
 	_set_scene(title)
-	# Defer title music on first load so iOS Safari AudioContext can be
-	# resumed by a user gesture before any audio plays.
-	if _first_show:
-		_first_show = false
-	else:
-		_play_music(_title_music)
+	_play_music(_title_music)
 
 
 func _start_new_game(player_count: int = 1) -> void:
