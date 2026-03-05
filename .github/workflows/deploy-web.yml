@@ -100,10 +100,33 @@ jobs:
       - name: Add iOS Safari audio unlock script
         run: |
           # iOS Safari suspends the Web Audio AudioContext until a user gesture
-          # calls resume(). This inline script patches the AudioContext constructor
-          # to track all instances and resumes them on the first touch/click.
-          AUDIO_SCRIPT='<script>(function(){var _c=[];var _O=window.AudioContext||window.webkitAudioContext;if(!_O)return;var _P=_O;window.AudioContext=function(){var c=new _P();_c.push(c);return c;};window.AudioContext.prototype=_O.prototype;if(window.webkitAudioContext)window.webkitAudioContext=window.AudioContext;function u(){_c.forEach(function(c){if(c.state==="suspended")c.resume();});document.removeEventListener("touchstart",u,true);document.removeEventListener("click",u,true);}document.addEventListener("touchstart",u,true);document.addEventListener("click",u,true);})();</script>'
-          sed -i "s|</head>|${AUDIO_SCRIPT}</head>|" build/web/index.html
+          # calls resume(). This script patches the AudioContext constructor to
+          # track all instances and resumes them on the first touch/click.
+          cat > build/web/audio-unlock.js << 'AUEOF'
+          (function() {
+            var contexts = [];
+            var Original = window.AudioContext || window.webkitAudioContext;
+            if (!Original) return;
+            var Patched = Original;
+            window.AudioContext = function() {
+              var ctx = new Patched();
+              contexts.push(ctx);
+              return ctx;
+            };
+            window.AudioContext.prototype = Original.prototype;
+            if (window.webkitAudioContext) window.webkitAudioContext = window.AudioContext;
+            function unlock() {
+              contexts.forEach(function(ctx) {
+                if (ctx.state === "suspended") ctx.resume();
+              });
+              document.removeEventListener("touchstart", unlock, true);
+              document.removeEventListener("click", unlock, true);
+            }
+            document.addEventListener("touchstart", unlock, true);
+            document.addEventListener("click", unlock, true);
+          })();
+          AUEOF
+          sed -i 's|<head>|<head><script src="audio-unlock.js"></script>|' build/web/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
