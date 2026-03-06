@@ -4,13 +4,14 @@ extends Node
 ## Creates GameState and passes it to child scenes — no autoloads.
 ## Manages title, game-over, and ending music with crossfade transitions.
 
-enum Screen { TITLE, LEVEL_INTRO, PLAYING, GAME_OVER, VICTORY, TRANSITION }
+enum Screen { TITLE, LEVEL_INTRO, PLAYING, GAME_OVER, VICTORY, CREDITS, TRANSITION }
 
 const TitleScene: PackedScene = preload("res://scenes/title_screen.tscn")
 const LevelIntroScene: PackedScene = preload("res://scenes/level_intro.tscn")
 const GameplayScene: PackedScene = preload("res://scenes/gameplay.tscn")
 const GameOverScene: PackedScene = preload("res://scenes/game_over.tscn")
 const VictoryScene: PackedScene = preload("res://scenes/victory_screen.tscn")
+const CreditsScene: PackedScene = preload("res://scenes/CreditsScreen.tscn")
 const FullscreenButtonScene: PackedScene = preload("res://scenes/fullscreen_button.tscn")
 
 const TITLE_MUSIC_PATH: String = "res://assets/audio/title-music.mp3"
@@ -174,9 +175,18 @@ func _show_victory() -> void:
 	_current_screen = Screen.VICTORY
 	var victory_screen: Control = VictoryScene.instantiate()
 	victory_screen.setup(_game_state.score)
-	victory_screen.go_to_title.connect(_show_title)
+	victory_screen.go_to_title.connect(_show_credits)
 	_set_scene(victory_screen)
 	_play_music(_ending_music)
+
+
+func _show_credits() -> void:
+	_clear_current_scene()
+	_current_screen = Screen.CREDITS
+	var credits: Control = CreditsScene.instantiate()
+	credits.credits_finished.connect(_show_title)
+	_set_scene(credits)
+	# Music continues from victory — no change needed
 
 
 func _show_game_over() -> void:
