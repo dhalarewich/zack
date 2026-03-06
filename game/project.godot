@@ -21,6 +21,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 window/size/viewport_width=960
 window/size/viewport_height=540
 window/stretch/mode="viewport"
+window/handheld/orientation=4
 
 [input]
 

@@ -455,10 +455,10 @@ func _build_pause_touch_button() -> void:
 
 func _draw_pause_icon() -> void:
 	var center := Vector2(880.0, 30.0)
-	_pause_touch_draw.draw_circle(center, 16.0, Color(0.0, 0.0, 0.0, 0.25))
-	var bar_color := Color(1.0, 1.0, 1.0, 0.35)
-	_pause_touch_draw.draw_rect(Rect2(center.x - 6.0, center.y - 7.0, 4.0, 14.0), bar_color)
-	_pause_touch_draw.draw_rect(Rect2(center.x + 2.0, center.y - 7.0, 4.0, 14.0), bar_color)
+	_pause_touch_draw.draw_circle(center, 18.0, Color(0.0, 0.0, 0.0, 0.4))
+	var bar_color := Color(1.0, 1.0, 1.0, 0.6)
+	_pause_touch_draw.draw_rect(Rect2(center.x - 6.0, center.y - 8.0, 4.0, 16.0), bar_color)
+	_pause_touch_draw.draw_rect(Rect2(center.x + 2.0, center.y - 8.0, 4.0, 16.0), bar_color)
 
 
 static func _is_tap(event: InputEvent) -> bool:

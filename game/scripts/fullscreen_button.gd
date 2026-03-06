@@ -104,11 +104,11 @@ func _is_tap(event: InputEvent) -> bool:
 
 
 func _on_draw() -> void:
-	var alpha: float = 0.35
+	var alpha: float = 0.6
 	var color := Color(1.0, 1.0, 1.0, alpha)
 
 	# Background circle
-	_draw_node.draw_circle(ICON_CENTER, 16.0, Color(0.0, 0.0, 0.0, 0.25))
+	_draw_node.draw_circle(ICON_CENTER, 18.0, Color(0.0, 0.0, 0.0, 0.4))
 
 	if _is_fullscreen:
 		# Collapse arrows — four arrows pointing inward

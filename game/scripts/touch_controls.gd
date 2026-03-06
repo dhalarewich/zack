@@ -11,6 +11,8 @@ const JOYSTICK_DEAD_ZONE: float = 12.0
 const FIRE_CENTER := Vector2(840.0, 430.0)
 const FIRE_RADIUS: float = 50.0
 
+const UI_BUTTON_ZONE_Y: float = 60.0
+
 const BASE_ALPHA: float = 0.3
 const ACTIVE_ALPHA: float = 0.5
 
@@ -60,6 +62,10 @@ func _handle_touch(event: InputEventScreenTouch) -> void:
 	var vp_pos: Vector2 = _screen_to_viewport(event.position)
 
 	if event.pressed:
+		# Top-right corner is reserved for UI buttons (fullscreen, pause).
+		# Let those taps pass through instead of triggering fire.
+		if vp_pos.y < UI_BUTTON_ZONE_Y and vp_pos.x >= 820.0:
+			return
 		# Left half → joystick
 		if vp_pos.x < 480.0 and _joystick_finger == -1:
 			_joystick_finger = event.index

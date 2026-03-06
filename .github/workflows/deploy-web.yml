@@ -128,6 +128,54 @@ jobs:
           AUEOF
           sed -i 's|<head>|<head><script src="audio-unlock.js"></script>|' build/web/index.html
 
+      - name: Add landscape orientation lock
+        run: |
+          # Force landscape on mobile: attempt Screen Orientation API lock
+          # and show a "rotate to play" overlay when held in portrait.
+          cat > build/web/landscape-lock.js << 'LLEOF'
+          (function() {
+            // Try the Screen Orientation API (works on Android Chrome in fullscreen)
+            function tryLock() {
+              if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(function(){});
+              }
+            }
+            document.addEventListener('fullscreenchange', tryLock);
+            document.addEventListener('webkitfullscreenchange', tryLock);
+            tryLock();
+
+            // Portrait overlay: show "rotate" message when in portrait
+            var overlay = document.createElement('div');
+            overlay.id = 'rotate-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;'
+              + 'background:rgba(0,0,0,0.92);display:none;'
+              + 'justify-content:center;align-items:center;';
+            var inner = document.createElement('div');
+            inner.style.textAlign = 'center';
+            var icon = document.createElement('div');
+            icon.style.cssText = 'font-size:48px;margin-bottom:16px';
+            icon.textContent = '\uD83D\uDCF1\u2194\uFE0F';
+            var msg = document.createElement('div');
+            msg.style.cssText = 'font-size:20px;font-family:sans-serif;color:#fff';
+            msg.textContent = 'Rotate your device to landscape';
+            inner.appendChild(icon);
+            inner.appendChild(msg);
+            overlay.appendChild(inner);
+            document.body.appendChild(overlay);
+
+            function checkOrientation() {
+              var isPortrait = window.innerHeight > window.innerWidth;
+              var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+              overlay.style.display = (isPortrait && isMobile) ? 'flex' : 'none';
+            }
+            window.addEventListener('resize', checkOrientation);
+            window.addEventListener('orientationchange', checkOrientation);
+            // Delay initial check so Godot canvas is laid out first
+            setTimeout(checkOrientation, 500);
+          })();
+          LLEOF
+          sed -i 's|<head>|<head><script src="landscape-lock.js"></script>|' build/web/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
