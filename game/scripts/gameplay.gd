@@ -4,6 +4,7 @@ extends Node2D
 
 signal game_over
 signal level_cleared
+signal quit_to_menu
 
 const PlayerScene: PackedScene = preload("res://scenes/player.tscn")
 const BulletScene: PackedScene = preload("res://scenes/bullet.tscn")
@@ -11,6 +12,7 @@ const EnemyScene: PackedScene = preload("res://scenes/enemy.tscn")
 const BossScene: PackedScene = preload("res://scenes/boss.tscn")
 const PowerUpScene: PackedScene = preload("res://scenes/power_up.tscn")
 const TouchControlsScene: PackedScene = preload("res://scenes/touch_controls.tscn")
+const PauseMenuScene: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const PLAYER2_SPRITE_PATH: String = "res://assets/sprites/player-ship2.png"
 const ENEMY_SPRITES: Array[String] = [
 	"res://assets/sprites/enemy-1.png",
@@ -31,6 +33,7 @@ const SHIELD_DROP_MAX: int = 24
 const COOP_ENEMY_MULTIPLIER: float = 1.2
 const COOP_SPAWN_RATE_MULTIPLIER: float = 0.83
 const COOP_BOSS_HP_MULTIPLIER: float = 1.25
+const LEVEL_CLEAR_FADE_DURATION: float = 2.0
 
 var _game_state: GameState
 var _level_data: LevelData
@@ -47,6 +50,9 @@ var _next_health_drop: int = 0
 var _next_shield_drop: int = 0
 var _players: Array[CharacterBody2D] = []
 var _coop_multiplier: float = 1.0
+var _pause_menu: CanvasLayer = null
+var _is_paused: bool = false
+var _pause_touch_draw: Control
 
 @onready var _player_container: Node2D = $Players
 @onready var _bullet_container: Node2D = $Bullets
@@ -85,6 +91,7 @@ func _ready() -> void:
 	_start_wave()
 	if DisplayServer.is_touchscreen_available():
 		add_child(TouchControlsScene.instantiate())
+		_build_pause_touch_button()
 
 
 func _spawn_players() -> void:
@@ -301,10 +308,8 @@ func _on_boss_destroyed(points: int) -> void:
 
 
 func _on_level_cleared() -> void:
-	if _music_player:
-		_music_player.stop()
-	if _boss_music_player:
-		_boss_music_player.stop()
+	_fade_out_level_music(_music_player)
+	_fade_out_level_music(_boss_music_player)
 	level_cleared.emit()
 
 
@@ -331,11 +336,16 @@ func _on_player_died(player_idx: int) -> void:
 
 
 func _on_all_players_dead() -> void:
-	if _music_player:
-		_music_player.stop()
-	if _boss_music_player:
-		_boss_music_player.stop()
+	_fade_out_level_music(_music_player)
+	_fade_out_level_music(_boss_music_player)
 	game_over.emit()
+
+
+func _fade_out_level_music(player: AudioStreamPlayer) -> void:
+	if player and player.playing:
+		var tween := create_tween()
+		tween.tween_property(player, "volume_db", -40.0, LEVEL_CLEAR_FADE_DURATION)
+		tween.tween_callback(player.stop)
 
 
 func _check_power_up_drop(pos: Vector2) -> void:
@@ -378,3 +388,87 @@ func _on_boss_shoot(pos: Vector2, dir: Vector2, bullet_color: Color) -> void:
 	var bullet: Area2D = BulletScene.instantiate()
 	bullet.setup(pos, dir, true, bullet_color)
 	_bullet_container.add_child(bullet)
+
+
+# ── Pause ──────────────────────────────────────────────────────────────
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause"):
+		_toggle_pause()
+		get_viewport().set_input_as_handled()
+
+
+func _input(event: InputEvent) -> void:
+	if not DisplayServer.is_touchscreen_available():
+		return
+	if _is_tap(event):
+		var vp_pos: Vector2 = _screen_to_viewport(event.position)
+		if vp_pos.distance_to(Vector2(880.0, 30.0)) <= 30.0:
+			_toggle_pause()
+			get_viewport().set_input_as_handled()
+
+
+func _toggle_pause() -> void:
+	if _is_paused:
+		_unpause()
+	else:
+		_do_pause()
+
+
+func _do_pause() -> void:
+	_is_paused = true
+	get_tree().paused = true
+	_pause_menu = PauseMenuScene.instantiate()
+	_pause_menu.resume_requested.connect(_unpause)
+	_pause_menu.quit_to_menu_requested.connect(_on_quit_to_menu)
+	add_child(_pause_menu)
+
+
+func _unpause() -> void:
+	_is_paused = false
+	get_tree().paused = false
+	if _pause_menu and is_instance_valid(_pause_menu):
+		_pause_menu.queue_free()
+		_pause_menu = null
+
+
+func _on_quit_to_menu() -> void:
+	_unpause()
+	if _music_player:
+		_music_player.stop()
+	if _boss_music_player:
+		_boss_music_player.stop()
+	quit_to_menu.emit()
+
+
+func _build_pause_touch_button() -> void:
+	var canvas := CanvasLayer.new()
+	canvas.layer = 98
+	_pause_touch_draw = Control.new()
+	_pause_touch_draw.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_pause_touch_draw.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_pause_touch_draw.draw.connect(_draw_pause_icon)
+	canvas.add_child(_pause_touch_draw)
+	add_child(canvas)
+
+
+func _draw_pause_icon() -> void:
+	var center := Vector2(880.0, 30.0)
+	_pause_touch_draw.draw_circle(center, 16.0, Color(0.0, 0.0, 0.0, 0.25))
+	var bar_color := Color(1.0, 1.0, 1.0, 0.35)
+	_pause_touch_draw.draw_rect(Rect2(center.x - 6.0, center.y - 7.0, 4.0, 14.0), bar_color)
+	_pause_touch_draw.draw_rect(Rect2(center.x + 2.0, center.y - 7.0, 4.0, 14.0), bar_color)
+
+
+static func _is_tap(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		return event.pressed
+	if event is InputEventMouseButton:
+		if DisplayServer.is_touchscreen_available():
+			return event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	return false
+
+
+func _screen_to_viewport(screen_pos: Vector2) -> Vector2:
+	return get_viewport().get_screen_transform().affine_inverse() * screen_pos

@@ -91,6 +91,7 @@ func _start_level() -> void:
 	gameplay.setup(_game_state)
 	gameplay.game_over.connect(_show_game_over)
 	gameplay.level_cleared.connect(_on_level_cleared)
+	gameplay.quit_to_menu.connect(_show_title)
 	_set_scene(gameplay)
 
 
@@ -125,7 +126,7 @@ func _show_level_transition() -> void:
 	title_label.offset_left = 0.0
 	title_label.offset_top = 160.0
 	title_label.offset_right = 960.0
-	title_label.offset_bottom = 230.0
+	title_label.offset_bottom = 220.0
 	title_label.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	var num_settings := LabelSettings.new()
 	num_settings.font_size = 48
